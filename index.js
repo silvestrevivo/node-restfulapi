@@ -67,6 +67,7 @@ const server = http.createServer((req, res) => {
       const payloadString = JSON.stringify(payload);
 
       // Return the response
+      res.setHeader('Content-Type', 'application/json');//get the payload as a parsed json
       res.writeHead(statusCode)
 
       // Response from the server to the screen when the buffer is ended

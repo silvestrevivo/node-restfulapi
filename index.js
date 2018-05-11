@@ -8,7 +8,8 @@
 // Dependencies
 const http = require('http'),
   url = require('url'),
-  StringDecoder = require('string_decoder').StringDecoder;
+  StringDecoder = require('string_decoder').StringDecoder,
+  config = require('./config');
 
 // The server should respond to all request with a string
 const server = http.createServer((req, res) => {
@@ -82,9 +83,11 @@ const server = http.createServer((req, res) => {
 
 });
 
-// Start the server, and have it listen on port 3000
-server.listen(3000, () => {
-  console.log('The server is listening on port 3000 now')
+// Start the server dynamically from config file
+server.listen(config.port, () => {
+  console.log(`The server is listening on port ${config.port} in ${config.envName} mode now`);
+  // We can type now on the terminal $ NODE_ENV=staging node index.js
+  // and we get the same environment than by default determinated in config.js
 });
 
 // Defining handlers

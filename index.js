@@ -7,13 +7,43 @@
 
 // Dependencies
 const http = require('http'),
+  https = require('https'),
+  fs = require('fs'),
   url = require('url'),
   StringDecoder = require('string_decoder').StringDecoder,
   config = require('./config');
 
-// The server should respond to all request with a string
-const server = http.createServer((req, res) => {
+// Instatiate the HTTP server
+const httpServer = http.createServer((req, res) => {
+  unifiedServer(req, res);
+});
 
+// Start the HTTP server
+httpServer.listen(config.httpPort, () => {
+  console.log(`The server is listening on port ${config.httpPort} in ${config.envName} mode now`);
+  // We can type now on the terminal $ NODE_ENV=staging node index.js
+  // and we get the same environment than by default determinated in config.js
+});
+
+// Instatiate the HTTPs server
+var httpsServerOptions = {
+  'key': fs.readFileSync('./https/key.pem'),
+  'cert': fs.readFileSync('./https/cert.pem'),
+}
+const httpsServer = https.createServer(httpsServerOptions, (req, res) => {
+  unifiedServer(req, res);
+});
+
+// Start the HTTP server
+httpsServer.listen(config.httpsPort, () => {
+  console.log(`The server is listening on port ${config.httpsPort} in ${config.envName} mode now`);
+  // We can type now on the terminal $ NODE_ENV=staging node index.js
+  // and we get the same environment than by default determinated in config.js
+});
+
+
+// All the server logic fot both servers, http and https
+var unifiedServer = function(req, res){
   // Get the URL and parse it to get the metadata of the request
   const parsedUrl = url.parse(req.url, true);
 
@@ -80,15 +110,7 @@ const server = http.createServer((req, res) => {
       console.log('Returning this response:', statusCode, payloadString);
     })
   });
-
-});
-
-// Start the server dynamically from config file
-server.listen(config.port, () => {
-  console.log(`The server is listening on port ${config.port} in ${config.envName} mode now`);
-  // We can type now on the terminal $ NODE_ENV=staging node index.js
-  // and we get the same environment than by default determinated in config.js
-});
+};
 
 // Defining handlers
 const handlers = {
